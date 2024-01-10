@@ -22,7 +22,7 @@
                         <li class="list-group-item">Время изучения: @Html.DisplayFor(modelItem => item.study_time)</li>
                         <li class="list-group-item">Количество Глав: @Html.DisplayFor(modelItem => item.chapters.Count)</li>
                         <li class="list-group-item">
-                            <a href="#" class="btn btn-primary">Просмотр</a>
+                            <a asp-action="ViewTheory" asp-route-id="@item.id" class="btn btn-primary">Просмотр</a>
                             <a asp-action="UpdateTheory" asp-route-id="@item.id" class="btn btn-primary">Редактирование</a>
                         </li>
                     </ul>

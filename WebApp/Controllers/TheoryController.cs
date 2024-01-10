@@ -13,6 +13,11 @@ namespace WebApp.Controllers
             string userAgent = HttpContext.Request.Headers.UserAgent;
             return View(APIClient.GetRequest<List<TheoryViewModel>>($"http://localhost:9002/theories/?user_agent={userAgent}"+ $"&get_content={true}"));
         }
+        [HttpGet]
+        public IActionResult ViewTheory(Guid id)
+        {
+            return View(APIClient.GetRequest<TheoryViewModel>($"http://localhost:9002/theory/?aId={id}"));
+        }
         public IActionResult CreateTheoryView() 
         {
             //тут заружаем форму элемента
@@ -24,7 +29,6 @@ namespace WebApp.Controllers
         {
             return View(APIClient.GetRequest<TheoryViewModel>($"http://localhost:9002/theory/?aId={id}"));
         }
-
         [HttpPost]
         public void UpdateTheory(TheoryViewModel theory)
         {
@@ -47,7 +51,6 @@ namespace WebApp.Controllers
 
             APIClient.PutRequest<TheoryViewModel>($"http://localhost:9002/theory/?user_agent={userAgent}&aId={theory.id}", theory);
         }
-
         [HttpPost]
         public string CreateTheoryView(TheoryViewModel theory)
         {

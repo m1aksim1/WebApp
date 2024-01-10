@@ -1,0 +1,91 @@
+﻿@using SoftwareInstallationClientApp;
+@model TheoryViewModel
+
+@{
+    ViewData["Title"] = "Изучение теории";
+}
+<head>
+    <!-- Обязательные метатеги -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+</head>
+<div>
+    <h2 class="display-4">@ViewData["Title"]</h2>
+</div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-2">Название:</div>
+            <div class="col-10"><input class="w-100" type="text" name="name" value="@Model.name" readonly id="name" /></div>
+            <div class="col-2">Время на изучения:</div>
+            <div class="col-10"><input class="w-100" type="time" id="StudyTime" value="@Model.study_time" readonly name="StudyTime" /></div>
+        </div>
+
+        <br/>
+            <div class="row">
+                <div class="chapter-list col-4">
+                @for(int i = 0;i < Model.chapters.Count;i++)
+                {
+                    var item = Model.chapters[i];
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" readonly id="@i" value="@item.name">
+                        <button class="btn btn-outline-secondary"  onclick="selectChapter(@i)" type="button">sel</button>
+                        <button class="btn btn-outline-secondary" type="button">del</button>
+                    </div>
+                }
+                </div>
+            
+                <div class="chapter-content col-8">
+                @for (int i = 0; i < Model.chapters.Count; i++)
+                {
+                    var item = Model.chapters[i];
+                    var _id = "chapterContent" + @i;
+                    <textarea class="w-100" hidden="true" readonly id="@_id" value="@item.content" rows="10"></textarea>
+                }
+                </div>
+            </div>
+    </div>
+
+
+
+<style>
+    .chapter {
+        cursor: pointer;
+    }
+
+    .text-panel {
+        flex: 1;
+    }
+</style>
+
+<script>
+    // Инициализация
+    let chapterTexts = {};
+
+    let currentChapter = 0; // Устанавливаем начальную главу
+
+    // Функция для выбора главы
+    function selectChapter(chapterNumber) {
+        console.log("das");
+        event.preventDefault();
+        var chapterList = document.querySelector('.chapter-list');
+        var currentTextArea = document.querySelector('textarea[id="chapterContent' + currentChapter + '"]');
+        var selectedTextArea = document.querySelector('textarea[id="chapterContent' + chapterNumber + '"]');
+
+        if (currentTextArea) {
+            currentTextArea.setAttribute('hidden', 'true');
+        }
+        if (selectedTextArea) {
+            selectedTextArea.removeAttribute('hidden');
+        }   
+
+        currentChapter = chapterNumber;
+        
+    }
+
+</script>
