@@ -42,5 +42,18 @@ namespace SoftwareInstallationClientApp
                 throw new Exception(result);
             }
         }
+        public static void PutRequest<T>(string requestUrl, T model)
+        {
+            var json = JsonConvert.SerializeObject(model);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = _client.PutAsync(requestUrl, data);
+
+            var result = response.Result.Content.ReadAsStringAsync().Result;
+            if (!response.Result.IsSuccessStatusCode)
+            {
+                throw new Exception(result);
+            }
+        }
     }
 }

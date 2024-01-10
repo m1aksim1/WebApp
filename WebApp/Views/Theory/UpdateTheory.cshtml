@@ -1,0 +1,149 @@
+﻿@using SoftwareInstallationClientApp;
+@model TheoryViewModel
+
+@{
+    ViewData["Title"] = "Создать теорию";
+}
+<head>
+    <!-- Обязательные метатеги -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+</head>
+<div>
+    <h2 class="display-4">@ViewData["Title"]</h2>
+</div>
+
+<form method="post">
+    <div class="container">
+        <div class="row">
+            <div class="col-2">Название:</div>
+            <div class="col-10"><input class="w-100" type="text" name="name" value="@Model.name" id="name" /></div>
+            <div class="col-2">Время на изучения:</div>
+            <div class="col-10"><input class="w-100" type="time" id="StudyTime" value="@Model.study_time" name="StudyTime" /></div>
+        </div>
+
+        <br/>
+        
+            <div class="row">
+                <div class="chapter-list col-4">
+                @for(int i = 0;i < Model.chapters.Count;i++)
+                {
+                    var item = Model.chapters[i];
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="@i" value="@item.name">
+                        <button class="btn btn-outline-secondary" onclick="selectChapter(@i)" type="button">sel</button>
+                        <button class="btn btn-outline-secondary" type="button">del</button>
+                    </div>
+                }
+                    <div class="input-group mb-3">
+                        <input type="text" id="newChapter" class="form-control" placeholder="Новая глава">
+                        <button onclick="addChapter()" class="btn btn-outline-secondary" type="button">Добавить</button>
+                    </div>
+                </div>
+            
+                <div class="chapter-content col-8">
+                @for (int i = 0; i < Model.chapters.Count; i++)
+                {
+                    var item = Model.chapters[i];
+                    var _id = "chapterContent" + @i;
+                    <textarea class="w-100"  hidden="true" id="@_id" value="@item.content" rows="10"></textarea>
+                }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12"><input class="w-100" type="submit" value="Обновить" /></div>
+            </div>
+    </div>
+</form>
+
+
+
+<style>
+    .chapter {
+        cursor: pointer;
+    }
+
+    .text-panel {
+        flex: 1;
+    }
+</style>
+
+<script>
+    // Инициализация
+    let chapterTexts = {};
+
+    let currentChapter = 0; // Устанавливаем начальную главу
+
+    // Функция для выбора главы
+    function selectChapter(chapterNumber) {
+        console.log("das");
+        event.preventDefault();
+        var chapterList = document.querySelector('.chapter-list');
+        var currentTextArea = document.querySelector('textarea[id="chapterContent' + currentChapter + '"]');
+        var selectedTextArea = document.querySelector('textarea[id="chapterContent' + chapterNumber + '"]');
+
+        if (currentTextArea) {
+            currentTextArea.setAttribute('hidden', 'true');
+        }
+        if (selectedTextArea) {
+            selectedTextArea.removeAttribute('hidden');
+        }   
+
+        currentChapter = chapterNumber;
+        
+    }
+
+    function addChapter() {
+        event.preventDefault();
+        var newChapterName = document.getElementById('newChapter').value;
+        if (newChapterName) {
+            // Добавление новой кнопки для выбора главы
+            var chapterList = document.querySelector('.chapter-list');
+            var chapterNumber = chapterList.childElementCount;
+
+            var div = document.createElement('div');
+            div.classList.add('input-group', 'mb-3');
+
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.classList.add('form-control');
+            input.name = 'Chapters[]';
+            input.value = newChapterName;
+            input.setAttribute('aria-label', 'Глава ' + (chapterNumber - 1));
+
+            var selectButton = document.createElement('button');
+            selectButton.classList.add('btn', 'btn-outline-secondary');
+            selectButton.setAttribute('type', 'button');
+            selectButton.textContent = 'sel';
+            selectButton.setAttribute('onclick', 'selectChapter(' + (chapterNumber - 1) + ')');
+
+            var deleteButton = document.createElement('button');
+            deleteButton.classList.add('btn', 'btn-outline-secondary');
+            deleteButton.setAttribute('type', 'button');
+            deleteButton.textContent = 'del';
+
+            div.appendChild(input);
+            div.appendChild(selectButton);
+            div.appendChild(deleteButton);
+
+            var addButton = chapterList.querySelector('.add-chapter-button');
+            chapterList.insertBefore(div, chapterList.firstElementChild);
+
+            // Добавление нового textarea
+            var textareaList = document.querySelector('.chapter-content');
+            var newTextArea = document.createElement('textarea');
+            newTextArea.setAttribute('class', 'w-100');
+            newTextArea.setAttribute('name', 'ChapterContents[]'); // Используем chapterList.children.length-2, так как мы уже добавили новую кнопку, и ее индекс равен chapterList.children.length-1
+            newTextArea.setAttribute('id', 'chapterContent' + (chapterList.children.length - 2)); // Используем chapterList.children.length-2, так как мы уже добавили новую кнопку, и ее индекс равен chapterList.children.length-1
+            newTextArea.setAttribute('rows', '10');
+            newTextArea.setAttribute('hidden', 'true');
+            textareaList.insertBefore(newTextArea, textareaList.firstElementChild);
+        }
+    }
+
+</script>
