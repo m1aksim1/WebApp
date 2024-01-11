@@ -1,0 +1,166 @@
+﻿@using SoftwareInstallationClientApp;
+@model List<TheoryViewModel>
+
+@{
+    ViewData["Title"] = "Создать тест";
+}
+<head>
+    <!-- Обязательные метатеги -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+</head>
+<div>
+    <h2 class="display-4">@ViewData["Title"]</h2>
+</div>
+
+<form method="post">
+    <div class="container" id="setting">
+        <div class="row mb-3">
+		    <div class="col-2">Название:</div>
+            <div class="col-10 mb-3"><input class="w-100" type="text" name="name" id="name" /></div>
+		    <div class="col-2">Время выполнения</div>
+            <div class="col-10 mb-3"><input class="w-100" type="time" id="StudyTime" name="StudyTime" /></div>
+            <div class="col-2">Количество попыткок</div>
+            <div class="col-10 mb-3"><input class="w-100" type="number" id="count_attempts" name="count_attempts" /></div>
+            <div class="col-2">Теория для теста</div>
+            <div class="col-10 mb-3">
+                @Html.DropDownList("name", new SelectList(Model, "id", "name"), new { @class = "form-control" })            
+            </div>
+            <div class="col-2">Перемешивать вопросы</div>
+            <div class="col-1">
+                <input type="checkbox" id="shuffle" name="shuffle" class="w-100" />
+            </div> 
+            <div class="col-2">Показывать ответы</div>
+            <div class="col-1"><input class="w-100" type="checkbox" id="show_answer" name="show_answer" /></div>
+	    </div>
+        <div class="row">
+            <div class="col-12"><input class="w-100" type="submit" onclick="toggleVisibility()" value="Продолжить" /></div>
+        </div>
+    </div>
+    <div class="container" id="question1" hidden="true">
+        <div class="row">
+            <div class="col-2">вопрос</div>
+            <div class="chapter-content col-10">
+                <textarea class="w-100" name="quest_content" id="quest_content" rows="10"></textarea>
+            </div>
+            <div class="col-2">вес вопроса</div>
+            <div class="col-10 mb-3"><input class="w-100" type="number" id="weight" name="weight" /></div>
+            
+            <div class="col-2">время ответа на вопрос</div>
+            <div class="col-10 mb-3"><input class="w-100" type="time" id="complition_time" name="complition_time" /></div>
+            
+            <div class="chapter-list col-12">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="answers1.1" name="answers1.1">
+                    <input type="checkbox" class="btn-check" name="answer1.1.IsTrue" autocomplete="off">
+                    <label class="btn btn-outline-success" for="btn-check-2-outlined">Ответ верный</label>
+                    <button class="btn btn-outline-secondary" type="button">del</button>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="answers1.1" name="answers1.2">
+                    <input type="checkbox" class="btn-check" name="answer1.2.IsTrue" autocomplete="off">
+                    <label class="btn btn-outline-success" for="btn-check-outlined">Ответ верный</label>
+                    <button class="btn btn-outline-secondary" type="button">del</button>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <input type="text" id="newChapter" class="form-control" placeholder="Новая Ответ">
+                <button onclick="addNewAnswer()" class="btn btn-outline-secondary" type="button">Добавить</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6"><input class="w-100" type="button" onclick="showPreviousQuestion()" value="Предыдущий Вопрос" /></div>
+            <div class="col-6"><input class="w-100" type="button" onclick="showNextQuestion()" value="Следующий Вопрос" /></div>
+        </div>
+    </div>
+</form>
+
+<script>
+    function toggleVisibility() {
+        event.preventDefault();
+        var setting = document.getElementById("setting");
+        var quest1 = document.getElementById("question1");
+
+        setting.setAttribute("hidden", 'true');
+        quest1.removeAttribute("hidden");
+    }
+    var currentQuestion = 1;
+
+    function showNextQuestion() {
+        // Скрываем текущий блок question
+        document.getElementById('question' + currentQuestion).hidden = true;
+
+        // Увеличиваем значение currentQuestion на 1
+        currentQuestion++;
+
+        // Проверяем, существует ли следующий вопрос
+        var nextQuestion = document.getElementById('question' + currentQuestion);
+        if (nextQuestion) {
+            // Если следующий вопрос существует, удаляем у него атрибут hidden
+            nextQuestion.removeAttribute('hidden');
+        } else {
+            // Если следующего вопроса нет, клонируем текущий вопрос и удаляем у него атрибут hidden
+            var currentQuestionBlock = document.getElementById('question' + (currentQuestion - 1));
+            var newQuestionBlock = currentQuestionBlock.cloneNode(true);
+            newQuestionBlock.id = 'question' + currentQuestion;
+            newQuestionBlock.removeAttribute('hidden');
+            currentQuestionBlock.parentNode.appendChild(newQuestionBlock);
+        }
+    }
+    
+    function showPreviousQuestion() {
+        // Скрываем текущий блок question
+        document.getElementById('question' + currentQuestion).hidden = true;
+
+        // Уменьшаем значение currentQuestion на 1
+        currentQuestion--;
+
+        // Отображаем предыдущий вопрос
+        var previousQuestion = document.getElementById('question' + currentQuestion);
+        previousQuestion.removeAttribute('hidden');
+    }
+
+    function addNewAnswer() {
+        event.preventDefault();
+        var newAnswerText = document.getElementById("newChapter").value;
+        var newAnswerId = "answers1." + (document.querySelectorAll('[id^="answers1."]').length + 1); // Генерируем уникальный ID для нового ответа
+
+        var newInputGroup = document.createElement("div");
+        newInputGroup.classList.add("input-group", "mb-3");
+
+        var newInput = document.createElement("input");
+        newInput.type = "text";
+        newInput.classList.add("form-control");
+        newInput.id = newAnswerId;
+        newInput.name = newAnswerId;
+        newInput.value = newAnswerText;
+
+        var newCheckbox = document.createElement("input");
+        newCheckbox.type = "checkbox";
+        newCheckbox.classList.add("btn-check");
+        newCheckbox.name = "answer1." + (document.querySelectorAll('[id^="answers1."]').length + 1) + ".IsTrue";
+        newCheckbox.autocomplete = "off";
+
+        var newLabel = document.createElement("label");
+        newLabel.classList.add("btn", "btn-outline-success");
+        newLabel.htmlFor = "btn-check-outlined";
+        newLabel.textContent = "Ответ верный";
+
+        var newButton = document.createElement("button");
+        newButton.classList.add("btn", "btn-outline-secondary");
+        newButton.type = "button";
+        newButton.textContent = "del";
+
+        newInputGroup.appendChild(newInput);
+        newInputGroup.appendChild(newCheckbox);
+        newInputGroup.appendChild(newLabel);
+        newInputGroup.appendChild(newButton);
+
+        document.querySelector(".chapter-list").appendChild(newInputGroup);
+    }
+</script>
