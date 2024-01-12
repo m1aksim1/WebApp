@@ -76,11 +76,11 @@ namespace WebApp.Controllers
             APIClient.PostRequest<TestViewModel>($"http://localhost:9002/test/?user_agent={userAgent}", model);
         }
         
-        [HttpPost]
-        public void ViewTest()
+        [HttpGet]
+        public IActionResult Test()
         {
             string userAgent = HttpContext.Request.Headers.UserAgent;
-            APIClient.GetRequest<TestViewModel>($"http://localhost:9002/created_test/?user_agent={userAgent}");
+            return View(APIClient.GetRequest<List<TestViewModel>>($"http://localhost:9002/created_test/?user_agent={userAgent}"));
         }
     }
 }
