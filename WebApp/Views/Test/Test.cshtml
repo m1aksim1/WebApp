@@ -1,5 +1,5 @@
 ﻿@using SoftwareInstallationClientApp;
-@model List<TestViewModel>
+@model List<TestViewModelView>
 
 @{
     ViewData["Title"] = "тесты";
@@ -12,7 +12,6 @@
 
     @foreach (var item in Model)
     {
-        var theoryname = item.theory;
         <div class="col-sm-4">
             <div class="card">
                 <div class="card-body">
@@ -20,9 +19,12 @@
                         <li class="list-group-item">
                             <h5 class="card-title">@Html.DisplayFor(modelItem => item.name)</h5>
                         </li>
-                        <li class="list-group-item">теория для изучения: @theoryname</li>
+                        <li class="list-group-item">теория для изучения: @item.theory.name</li>
                         <li class="list-group-item">Время изучения: @Html.DisplayFor(modelItem => item.complition_time)</li>
-                        <li class="list-group-item">Количество вопросов: @Html.DisplayFor(modelItem => item.count_attempts)</li>
+                        <li class="list-group-item">Количество попыток: @Html.DisplayFor(modelItem => item.count_attempts)</li>
+                        <li class="list-group-item">Количество вопросов: @Html.DisplayFor(modelItem => item.questions.Count)</li>
+                        <li class="list-group-item">id теста: @Html.DisplayFor(modelItem => item.id)</li>
+
                         <li class="list-group-item">
                             <a asp-action="PassingTest" asp-route-id="@item.id" class="btn btn-primary">Пройти</a>
                         </li>

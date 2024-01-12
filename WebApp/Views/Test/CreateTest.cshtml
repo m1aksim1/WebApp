@@ -85,14 +85,16 @@
                 '        ' +
                 `        <div class="answer-list${currentQuestion} col-12">` +
                 '            <div class="input-group mb-3">' +
+                `                <input type="hidden" name = "answers${currentQuestion}IsTrue[]" id = "btn-check-outlined${currentQuestion}.1-hid" value = "false" >` +
                 `                <input type="text" class="form-control" name="answers${currentQuestion}[]">` +
-                `                <input type="checkbox" onchange="toggleCheckboxValue(this)" class="btn-check" id="btn-check-outlined${currentQuestion}.1" name="answer${currentQuestion}IsTrue[]" autocomplete="off">` +
+                `                <input type="checkbox" onchange="updateHiddenValue(this)" class="btn-check" id="btn-check-outlined${currentQuestion}.1" autocomplete="off">` +
                 `                <label class="btn btn-outline-success" for="btn-check-outlined${currentQuestion}.1">Ответ верный</label>` +
                 '                <button class="btn btn-outline-secondary" type="button">del</button>' +
                 '            </div>' +
                 '            <div class="input-group mb-3">' +
+                `                <input type="hidden" name = "answers${currentQuestion}IsTrue[]" id = "btn-check-outlined${currentQuestion}.2-hid" value = "false" >` +
                 `                <input type="text" class="form-control" name="answers${currentQuestion}[]">` +
-                `                <input type="checkbox" class="btn-check" id="btn-check-outlined${currentQuestion}.2" name="answer${currentQuestion}IsTrue[]" autocomplete="off">` +
+                `                <input type="checkbox" onchange="updateHiddenValue(this)" class="btn-check" id="btn-check-outlined${currentQuestion}.2" autocomplete="off">` +
                 `                <label class="btn btn-outline-success" for="btn-check-outlined${currentQuestion}.2">Ответ верный</label>` +
                 '                <button class="btn btn-outline-secondary" type="button">del</button>' +
                 '            </div>' +
@@ -129,11 +131,24 @@
             previousQuestion.removeAttribute('hidden');
         }
     }
+    function updateHiddenValue(checkbox) {
+        var hiddenInput = document.getElementById(`${checkbox.id}-hid`);
+        console.log(checkbox);
+        if (checkbox.checked) {
+            hiddenInput.removeAttribute("value");
+            hiddenInput.setAttribute("value", "true");
+
+        }
+        else {
+            hiddenInput.removeAttribute("value");
+            hiddenInput.setAttribute("value", "false");
+        }
+    }
 
     function addNewAnswer() {
         event.preventDefault();
         var newAnswerText = document.getElementById("newAnswer" + currentQuestion).value;
-        var newAnswerId = "answers" + (document.querySelectorAll('[id^="answers"]').length + 3); // Генерируем уникальный ID для нового ответа
+        var newAnswerId = "answers" + (document.querySelectorAll(`input[name="answers${currentQuestion}[]"]`).length+1); // Генерируем уникальный ID для нового ответа
 
         var newInputGroup = document.createElement("div");
         newInputGroup.classList.add("input-group", "mb-3");
@@ -145,11 +160,18 @@
         newInput.name = `answers${currentQuestion}[]`;
         newInput.value = newAnswerText;
 
+        var newhidInput = document.createElement("input");
+        newhidInput.type = "hidden";
+        newhidInput.classList.add("btn-check");
+        newhidInput.id = "btn-check-outlined" + currentQuestion + "." + (document.querySelectorAll(`input[name="answers${currentQuestion}[]"]`).length + 1) + "-hid";
+        newhidInput.name = `answers${currentQuestion}IsTrue[]`;
+        newhidInput.value = "false";
+
+
         var newCheckbox = document.createElement("input");
         newCheckbox.type = "checkbox";
         newCheckbox.classList.add("btn-check");
-        newCheckbox.id = "btn-check-outlined" + currentQuestion + "." + (document.querySelectorAll('[id^="answers"]').length + 3);
-        newCheckbox.name = `answer${currentQuestion}IsTrue[]`;
+        newCheckbox.id = "btn-check-outlined" + currentQuestion + "." + (document.querySelectorAll(`input[name="answers${currentQuestion}[]"]`).length + 1);
         newCheckbox.autocomplete = "off";
 
         var newLabel = document.createElement("label");
@@ -163,6 +185,7 @@
         newButton.textContent = "del";
 
         newInputGroup.appendChild(newInput);
+        newInputGroup.appendChild(newhidInput);
         newInputGroup.appendChild(newCheckbox);
         newInputGroup.appendChild(newLabel);
         newInputGroup.appendChild(newButton);

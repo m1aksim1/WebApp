@@ -44,20 +44,15 @@ namespace WebApp.Controllers
                 QuestionViewModel questionViewModel = new QuestionViewModel();
                 
                 var answers = form["answers"+ (i+1) +"[]"];
-                var answersIsTrue = form["answer" + (i + 1) + "IsTrue[]"];
+                var answersIsTrue = form["answers" + (i + 1) + "IsTrue[]"];
 
                 for ( int j = 0; j < answers.Count; j++)
                 {
                     AnswerTest answerTest = new AnswerTest();
                     answerTest.text = answers[j];
-                    if(answersIsTrue[j] == "on")
-                    {
-                        answerTest.is_correct = true;
-                    }
-                    else
-                    {
-                        answerTest.is_correct = false;
-                    }
+                    answerTest.is_correct = bool.Parse(answersIsTrue[j]);
+                    
+    
                     questionViewModel.answer_test.Add(answerTest);
                 }
                 
@@ -80,7 +75,21 @@ namespace WebApp.Controllers
         public IActionResult Test()
         {
             string userAgent = HttpContext.Request.Headers.UserAgent;
-            return View(APIClient.GetRequest<List<TestViewModel>>($"http://localhost:9002/created_test/?user_agent={userAgent}"));
+            return View(APIClient.GetRequest<List<TestViewModelView>>($"http://localhost:9002/created_test/?user_agent={userAgent}"));
+        }
+        [HttpGet]
+        public IActionResult PassingTest(Guid id)
+        {
+            string userAgent = HttpContext.Request.Headers.UserAgent;
+            try
+            {
+                APIClient.PostRequest<TestViewModelView>($"http://localhost:9002/start_test/?user_agent={userAgent}&aId={id}", new TestViewModelView());
+                return View(APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
+            }
+            catch (Exception)
+            {
+                return View(APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
+            }
         }
     }
 }
