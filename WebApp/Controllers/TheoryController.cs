@@ -16,7 +16,7 @@ namespace WebApp.Controllers
         [HttpGet]
         public IActionResult ViewTheory(Guid id)
         {
-            return View(APIClient.GetRequest<TheoryViewModel>($"http://localhost:9002/theory/?aId={id}"));
+            return View(APIClient.GetRequest<TheoryViewModel>($"http://localhost:9002/theory/?aId={id}&get_content={true}"));
         }
         public IActionResult CreateTheoryView() 
         {
@@ -27,7 +27,7 @@ namespace WebApp.Controllers
         [HttpGet]
         public IActionResult UpdateTheory(Guid id)
         {
-            return View(APIClient.GetRequest<TheoryViewModel>($"http://localhost:9002/theory/?aId={id}"));
+            return View(APIClient.GetRequest<TheoryViewModel>($"http://localhost:9002/theory/?aId={id}&get_content={true}"));
         }
         [HttpPost]
         public void UpdateTheory(TheoryViewModel theory)
