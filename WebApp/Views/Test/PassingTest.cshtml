@@ -5,10 +5,13 @@
     ViewData["Title"] = "тесты";
 }
 <div>
-    <h2 class="display-4">@ViewData["Title"]</h2>
+    <h2 class="display-4">@ViewData["Title"]
+        <div id="timer">Оставшиееся время 00:00 </div>
+    </h2>
+
 </div>
 
-<h2 class="display-5"> Вопрос: ${currentQuestion} </h2>
+<form method="post">
 <div class="row">
     <div class="col-2">вопрос</div>
     <div class="chapter-content col-10">
@@ -17,16 +20,63 @@
     <div class="col-2">вес вопроса</div>
     <div class="col-10 mb-3"><input class="w-100" readonly type="number" value="@Html.DisplayFor(modelItem => Model.weight)"/></div>
     <div class="col-2">время ответа на вопрос</div>
-    <div class="col-10 mb-3"><input class="w-100" type="time" value="@Html.DisplayFor(modelItem => Model.complition_time)"/></div>
-    @foreach (var item in Model.answer_test)
+    <div class="col-10 mb-3"><input class="w-100" readonly type="time" value="@Html.DisplayFor(modelItem => Model.complition_time)" /></div>
+    @for (int i = 0; i < Model.answers_test.Count; i++)
     {
-        <div class="col-12">
-            <div class="input-group mb-3">
-                <input type="text" value="@item.text" class="form-control">
-            </div>
+        <div class="input-group">
+            <input type="hidden" name="answersIsTrue[]" id="btn-check-outlined@(i)-hid" value="false">
+            <input type="hidden" name="answersId[]" value="@Model.answers_test[i].id">
+
+            <input type="text" value="@Model.answers_test[i].text" class="form-control">
+            <input type="checkbox" onchange="updateHiddenValue(this)" class="btn-check" id="btn-check-outlined@(i)">
+            <label class="btn btn-outline-success" for="btn-check-outlined@(i)">Ответ верный</label>
         </div>
     }
-</div>
- <div class="row">
-    <div class="col-12"> <input class="w-100" type="submit" value="Сохранить" /> </div>
-</div>
+    </div>
+     <div class="row">
+        <div class="col-12"> <input class="w-100" type="submit" value="Сохранить" /> </div>
+    </div>
+</form>
+@section scripts {
+    <script>
+        // Получаем время из модели Test
+
+        // Получаем количество миллисекунд из модели представления
+        var remainingTime = @Model.RemainingTime;
+
+        // Функция для обновления таймера
+        function updateTimer() {
+            // Преобразуем оставшееся время из миллисекунд в минуты и секунды
+            var minutes = Math.floor(remainingTime / 60000);
+            var seconds = ((remainingTime % 60000) / 1000).toFixed(0);
+
+            // Отображаем время в формате "мм:сс"
+            document.getElementById('timer').innerHTML = "Оставшиееся время "+ (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+
+            // Уменьшаем оставшееся время на 1 секунду
+            remainingTime -= 1000;
+
+            // Проверяем, не истекло ли время
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval); // Останавливаем таймер
+                document.getElementById('timer').innerHTML = "Время вышло";
+                // Выполняем дополнительные действия, если необходимо
+            }
+        }
+
+        // Обновляем таймер каждую секунду
+        var timerInterval = setInterval(updateTimer, 1000);
+        function updateHiddenValue(checkbox) {
+            var hiddenInput = document.getElementById(`${checkbox.id}-hid`);
+            console.log(checkbox);
+            if (checkbox.checked) {
+                hiddenInput.removeAttribute("value");
+                hiddenInput.setAttribute("value", "true");
+            }
+            else {
+                hiddenInput.removeAttribute("value");
+                hiddenInput.setAttribute("value", "false");
+            }
+        }
+    </script>
+}

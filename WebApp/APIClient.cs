@@ -17,7 +17,7 @@ namespace SoftwareInstallationClientApp
 
         public static T? GetRequest<T>(string requestUrl)
         {
-            var response = _client.GetAsync(requestUrl);
+            var response = _client.GetAsync(requestUrl);    
             var result = response.Result.Content.ReadAsStringAsync().Result;
             if (response.Result.IsSuccessStatusCode)
             {

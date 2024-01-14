@@ -52,15 +52,14 @@ namespace WebApp.Controllers
                     answerTest.text = answers[j];
                     answerTest.is_correct = bool.Parse(answersIsTrue[j]);
                     
-    
-                    questionViewModel.answer_test.Add(answerTest);
+                    questionViewModel.answers_test.Add(answerTest);
                 }
                 
                 var quest = new QuestionViewModel
                 {
                     pointer_to_answer = new PointerToAnswer { chapter = new Guid("00bfd2af-b124-43f6-b5e6-e01279d6671e"), start = 0, end = 0 },
                     weight = int.Parse(weights[i]),
-                    answer_test = questionViewModel.answer_test,
+                    answers_test = questionViewModel.answers_test,
                     complition_time = complition_times[i]+":00.000Z",
                     name = quest_contents[i],
                 };
@@ -83,13 +82,40 @@ namespace WebApp.Controllers
             string userAgent = HttpContext.Request.Headers.UserAgent;
             try
             {
-                APIClient.PostRequest<TestViewModelView>($"http://localhost:9002/start_test/?user_agent={userAgent}&aId={id}", new TestViewModelView());
-                return View(APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
+                APIClient.PostRequest<TestViewModelView>($"http://localhost:9002/start_test/?user_agent={userAgent}&test_id={id}", new TestViewModelView());
+                var Test = APIClient.GetRequest<TestViewModelView>($"http://localhost:9002/test/?user_agent={userAgent}&aId={id}");
+                var Quest = APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}");
+                Quest.RemainingTime = (long)TimeSpan.Parse(Test.complition_time).TotalMilliseconds;
+                return View(Quest);
             }
             catch (Exception)
             {
-                return View(APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
+                var Test = APIClient.GetRequest<TestViewModelView>($"http://localhost:9002/test/?user_agent={userAgent}&aId={id}");
+                var Quest = APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}");
+                Quest.RemainingTime = (long)TimeSpan.Parse(Test.complition_time).TotalMilliseconds;
+                return View(Quest);
             }
+        }
+        [HttpPost]
+        public IActionResult PassingTest()
+        {
+            var answers = new AnswerViewModel();
+            answers.text_answer = "почему";
+            string userAgent = HttpContext.Request.Headers.UserAgent;
+            var form = this.ControllerContext.HttpContext.Request.Form;
+            var AnswersIsTrue = form["answersIsTrue[]"];
+            var AnswersId = form["answersId[]"];
+
+            for (int i = 0; i < AnswersIsTrue.Count; i++)
+            {
+                if (bool.Parse(AnswersIsTrue[i])){
+                    answers.answers.Add(AnswersId[i]);
+                }
+            }
+
+            APIClient.PostRequest<AnswerViewModel>($"http://localhost:9002/answer/?user_agent={userAgent}", answers);
+
+            return View(APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
         }
     }
 }
