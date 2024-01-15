@@ -30,7 +30,7 @@
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" id="0" name="Chapters[]" value="Глава 1">
                     <button class="btn btn-outline-secondary" onclick="selectChapter(0)" type="button">sel</button>
-                    <button class="btn btn-outline-secondary" type="button">del</button>
+                    <button class="btn btn-outline-secondary" onclick="deleteChapter(this, 0)" type="button">del</button>
                 </div>
                 <div class="input-group mb-3">
                     <input type="text" id="newChapter" class="form-control" placeholder="Новая глава">
@@ -83,6 +83,18 @@
             currentChapter = chapterNumber;
         }
     }
+    function deleteChapter(button, chapterNumber) {
+        event.preventDefault();
+        if (currentChapter != chapterNumber) {
+            var chapterList = document.querySelector('.chapter-list');
+            var currentTextArea = document.querySelector('textarea[id="chapterContent' + chapterNumber + '"]');
+
+            if (currentTextArea) {
+                currentTextArea.remove();
+                button.parentNode.remove();
+            }
+        }
+    }
 
     function addChapter() {
         event.preventDefault();
@@ -112,6 +124,8 @@
             deleteButton.classList.add('btn', 'btn-outline-secondary');
             deleteButton.setAttribute('type', 'button');
             deleteButton.textContent = 'del';
+            deleteButton.setAttribute('onclick', 'deleteChapter(this,' + (chapterNumber - 1) + ')');
+
 
             div.appendChild(input);
             div.appendChild(selectButton);
