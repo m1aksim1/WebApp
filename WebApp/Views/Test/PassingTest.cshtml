@@ -21,18 +21,28 @@
     <div class="col-10 mb-3"><input class="w-100" readonly type="number" value="@Html.DisplayFor(modelItem => Model.weight)"/></div>
     <div class="col-2">время ответа на вопрос</div>
     <div class="col-10 mb-3"><input class="w-100" readonly type="time" value="@Html.DisplayFor(modelItem => Model.complition_time)" /></div>
-    @for (int i = 0; i < Model.answers_test.Count; i++)
-    {
-        <div class="input-group">
-            <input type="hidden" name="answersIsTrue[]" id="btn-check-outlined@(i)-hid" value="false">
-            <input type="hidden" name="answersId[]" value="@Model.answers_test[i].id">
-
-            <input type="text" value="@Model.answers_test[i].text" class="form-control">
-            <input type="checkbox" onchange="updateHiddenValue(this)" class="btn-check" id="btn-check-outlined@(i)">
-            <label class="btn btn-outline-success" for="btn-check-outlined@(i)">Ответ верный</label>
-        </div>
-    }
+        @if (Model.type == "QuestionChoice")
+        {
+            @for (int i = 0; i < Model.answers_test.Count; i++)
+            {
+                <div class="input-group">
+                    <input type="hidden" name="answersIsTrue[]" id="btn-check-outlined@(i)-hid" value="false">
+                    <input type="hidden" name="answersId[]" value="@Model.answers_test[i].id">
+                    <input type="text" value="@Model.answers_test[i].text" class="form-control">
+                    <input type="checkbox" onchange="updateHiddenValue(this)" class="btn-check" id="btn-check-outlined@(i)">
+                    <label class="btn btn-outline-success" for="btn-check-outlined@(i)">Ответ верный</label>
+                </div>
+            }
+        }
+        @if (Model.type == "QuestionInputAnswer")
+        {
+            <div class="input-group mb-3">
+                <label>Ответ: </label>
+                <input type="text" name="TextAnswer" value="" class="form-control">
+            </div>
+        }
     </div>
+
      <div class="row">
         <div class="col-12"> <input class="w-100" type="submit" value="Сохранить" /> </div>
     </div>
@@ -42,8 +52,8 @@
         // Получаем время из модели Test
 
         // Получаем количество миллисекунд из модели представления
-        var remainingTime = @Model.RemainingTime;
-
+        var remainingTime = @Model.RemainingTime != 0 ? @Model.RemainingTime : parseInt(getCookie("RemainingTime"));
+        console.log(document.cookie);
         // Функция для обновления таймера
         function updateTimer() {
             // Преобразуем оставшееся время из миллисекунд в минуты и секунды
@@ -51,10 +61,13 @@
             var seconds = ((remainingTime % 60000) / 1000).toFixed(0);
 
             // Отображаем время в формате "мм:сс"
-            document.getElementById('timer').innerHTML = "Оставшиееся время "+ (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+            document.getElementById('timer').innerHTML = "Оставшиееся время " + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
 
             // Уменьшаем оставшееся время на 1 секунду
             remainingTime -= 1000;
+
+            // Сохраняем значение оставшегося времени в куки
+            document.cookie = "RemainingTime=" + remainingTime + "; path=/";
 
             // Проверяем, не истекло ли время
             if (remainingTime <= 0) {
@@ -62,6 +75,13 @@
                 document.getElementById('timer').innerHTML = "Время вышло";
                 // Выполняем дополнительные действия, если необходимо
             }
+        }
+
+        // Функция для получения значения куки по имени
+        function getCookie(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
         }
 
         // Обновляем таймер каждую секунду

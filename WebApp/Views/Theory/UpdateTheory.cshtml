@@ -35,9 +35,8 @@
                 {
                     var item = Model.chapters[i];
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="@i" value="@item.name">
+                        <input type="text" class="form-control" readonly id="@i" value="@item.name">
                         <button class="btn btn-outline-secondary" onclick="selectChapter(@i)" type="button">sel</button>
-                        <button class="btn btn-outline-secondary" type="button">del</button>
                     </div>
                 }
                     <div class="input-group mb-3">
@@ -51,7 +50,7 @@
                 {
                     var item = Model.chapters[i];
                     var _id = "chapterContent" + @i;
-                    <textarea class="w-100"  hidden="true" id="@_id" value="@item.content" rows="10"></textarea>
+                    <textarea class="w-100" readonly hidden="true" id="@_id" value="@item.content" rows="10"></textarea>
                 }
                 </div>
             </div>
@@ -145,5 +144,65 @@
             textareaList.insertBefore(newTextArea, textareaList.firstElementChild);
         }
     }
+    function deleteChapter(button, chapterNumber) {
+        event.preventDefault();
+        if (currentChapter != chapterNumber) {
+            var chapterList = document.querySelector('.chapter-list');
+            var currentTextArea = document.querySelector('textarea[id="chapterContent' + chapterNumber + '"]');
 
+            if (currentTextArea) {
+                currentTextArea.remove();
+                button.parentNode.remove();
+            }
+        }
+    }
+    function addChapter() {
+        event.preventDefault();
+        var newChapterName = document.getElementById('newChapter').value;
+        if (newChapterName) {
+            // Добавление новой кнопки для выбора главы
+            var chapterList = document.querySelector('.chapter-list');
+            var chapterNumber = chapterList.childElementCount;
+
+            var div = document.createElement('div');
+            div.classList.add('input-group', 'mb-3');
+
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.classList.add('form-control');
+            input.name = 'Chapters[]';
+            input.value = newChapterName;
+            input.setAttribute('aria-label', 'Глава ' + (chapterNumber - 1));
+
+            var selectButton = document.createElement('button');
+            selectButton.classList.add('btn', 'btn-outline-secondary');
+            selectButton.setAttribute('type', 'button');
+            selectButton.textContent = 'sel';
+            selectButton.setAttribute('onclick', 'selectChapter(' + (chapterNumber - 1) + ')');
+
+            var deleteButton = document.createElement('button');
+            deleteButton.classList.add('btn', 'btn-outline-secondary');
+            deleteButton.setAttribute('type', 'button');
+            deleteButton.textContent = 'del';
+            deleteButton.setAttribute('onclick', 'deleteChapter(this,' + (chapterNumber - 1) + ')');
+
+
+            div.appendChild(input);
+            div.appendChild(selectButton);
+            div.appendChild(deleteButton);
+
+            var addButton = chapterList.querySelector('.add-chapter-button');
+            chapterList.insertBefore(div, chapterList.firstElementChild);
+
+            // Добавление нового textarea
+            var textareaList = document.querySelector('.chapter-content');
+            var newTextArea = document.createElement('textarea');
+            newTextArea.setAttribute('class', 'w-100');
+            newTextArea.setAttribute('name', 'ChapterContents[]'); // Используем chapterList.children.length-2, так как мы уже добавили новую кнопку, и ее индекс равен chapterList.children.length-1
+            newTextArea.setAttribute('id', 'chapterContent' + (chapterList.children.length - 2)); // Используем chapterList.children.length-2, так как мы уже добавили новую кнопку, и ее индекс равен chapterList.children.length-1
+            newTextArea.setAttribute('rows', '10');
+            newTextArea.setAttribute('hidden', 'true');
+            textareaList.insertBefore(newTextArea, textareaList.firstElementChild);
+        }
+    }
 </script>

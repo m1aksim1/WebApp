@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RestSharp;
 using SoftwareInstallationClientApp;
 using System.Globalization;
 using System.Reflection;
@@ -100,22 +101,37 @@ namespace WebApp.Controllers
         public IActionResult PassingTest()
         {
             var answers = new AnswerViewModel();
-            answers.text_answer = "почему";
+            
             string userAgent = HttpContext.Request.Headers.UserAgent;
             var form = this.ControllerContext.HttpContext.Request.Form;
             var AnswersIsTrue = form["answersIsTrue[]"];
             var AnswersId = form["answersId[]"];
-
-            for (int i = 0; i < AnswersIsTrue.Count; i++)
+            var TextAnswer = form["TextAnswer"];
+            if (TextAnswer.Count > 0)
             {
-                if (bool.Parse(AnswersIsTrue[i])){
-                    answers.answers.Add(AnswersId[i]);
+                answers.text_answer = TextAnswer;
+            }
+            else
+            {
+                for (int i = 0; i < AnswersIsTrue.Count; i++)
+                {
+                    if (bool.Parse(AnswersIsTrue[i]))
+                    {
+                        answers.answers.Add(AnswersId[i]);
+                    }
                 }
             }
-
-            APIClient.PostRequest<AnswerViewModel>($"http://localhost:9002/answer/?user_agent={userAgent}", answers);
-
-            return View(APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
+            try
+            {
+                APIClient.PostRequest<AnswerViewModel>($"http://localhost:9002/answer/?user_agent={userAgent}", answers);
+                return View(APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
+            }
+            catch (Exception ex)
+            {
+                var Results = APIClient.GetRequest<List<ResultViewModel>>($"http://localhost:9002/results_test_by_user_easy/?user_agent={userAgent}");
+                
+                return View("~/Views/Result/TestResult.cshtml", Results.Last());
+            }
         }
     }
 }
