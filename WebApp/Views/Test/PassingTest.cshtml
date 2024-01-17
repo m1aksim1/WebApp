@@ -19,8 +19,6 @@
     </div>
     <div class="col-2">вес вопроса</div>
     <div class="col-10 mb-3"><input class="w-100" readonly type="number" value="@Html.DisplayFor(modelItem => Model.weight)"/></div>
-    <div class="col-2">время ответа на вопрос</div>
-    <div class="col-10 mb-3"><input class="w-100" readonly type="time" value="@Html.DisplayFor(modelItem => Model.complition_time)" /></div>
         @if (Model.type == "QuestionChoice")
         {
             @for (int i = 0; i < Model.answers_test.Count; i++)

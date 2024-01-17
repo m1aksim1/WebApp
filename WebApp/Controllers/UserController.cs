@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApp.Controllers
 {
@@ -18,17 +19,31 @@ namespace WebApp.Controllers
         {
             _client = client;
         }
+        [HttpPost]
+        [Authorize]
+        public void Logout()
+        {
+            Response.Cookies.Delete("token");
+            Response.Redirect("Enter");
+        }
         public IActionResult Enter()
         {
-            return View();
+            if (User.Identity.IsAuthenticated)
+            {
+                return View("~/Views/User/Logout.cshtml");
+            }
+            else
+            {
+                return View();
+            }
         }
         [HttpPost]
-        public IActionResult Enter(string login, string password)
+        public void Enter(string login, string password)
         {
             var account = _client.Users.FirstOrDefault(x => x.Login.Equals(login) && x.Password.Equals(password));
             if(account == null)
             {
-                return View();
+                Response.Redirect("Enter");
             }
             var claims = new List<Claim>
             {
@@ -43,8 +58,7 @@ namespace WebApp.Controllers
                 signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var jwtToken = "Bearer " + new JwtSecurityTokenHandler().WriteToken(jwt);
             Response.Cookies.Append("token", jwtToken);
-            return Ok(jwtToken);
-
+            Response.Redirect("Enter");
         }
     }
 }

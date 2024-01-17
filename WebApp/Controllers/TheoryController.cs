@@ -14,7 +14,6 @@ namespace WebApp.Controllers
         {
             _client = client;
         }
-        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Theory()
         {
@@ -25,18 +24,18 @@ namespace WebApp.Controllers
         {
             return View(_client.GetRequest<TheoryViewModel>($"theory/?aId={id}&get_content={true}"));
         }
+        [Authorize]
         public IActionResult CreateTheoryView() 
         {
-            //todo возможно нужно удалить?
-            //тут заружаем форму элемента
             return View();
         }
-
+        [Authorize]
         [HttpGet]
         public IActionResult UpdateTheory(Guid id)
         {
             return View(_client.GetRequest<TheoryViewModel>($"theory/?aId={id}&get_content={true}"));
         }
+        [Authorize]
         [HttpPost]
         public void UpdateTheory(TheoryViewModel theory)
         {
@@ -58,8 +57,9 @@ namespace WebApp.Controllers
 
             _client.PutRequest<TheoryViewModel>($"theory/?aId={theory.id}", theory);
         }
+        [Authorize]
         [HttpPost]
-        public string CreateTheoryView(TheoryViewModel theory)
+        public void CreateTheoryView(TheoryViewModel theory)
         {
             var form = this.ControllerContext.HttpContext.Request.Form;
             var Chpaters = form["Chapters[]"];
@@ -79,7 +79,7 @@ namespace WebApp.Controllers
             theory.study_time = theory.StudyTime.ToString("o",CultureInfo.InvariantCulture);
 
             _client.PostRequest<TheoryViewModel>($"theory/", theory);
-            return "das";
+            Response.Redirect("Theory");
         }
     }
 }

@@ -23,7 +23,10 @@
                         <li class="list-group-item">Количество Глав: @Html.DisplayFor(modelItem => item.chapters.Count)</li>
                         <li class="list-group-item">
                             <a asp-action="ViewTheory" asp-route-id="@item.id" class="btn btn-primary">Просмотр</a>
-                            <a asp-action="UpdateTheory" asp-route-id="@item.id" class="btn btn-primary">Редактирование</a>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <a asp-action="UpdateTheory" asp-route-id="@item.id" class="btn btn-primary">Редактирование</a>   
+                            }
                         </li>
                     </ul>
                 </div>
