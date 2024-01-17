@@ -3,12 +3,16 @@
     public class AuthenticationMiddleware
     {
         private readonly RequestDelegate _next;
-        public AuthenticationMiddleware(RequestDelegate next)
+        private readonly APIClient _api;
+        public AuthenticationMiddleware(RequestDelegate next, APIClient api)
         {
             _next = next;
+            _api = api;
         }
         public async Task InvokeAsync(HttpContext context)
         {
+            _api.IP = context.Connection.RemoteIpAddress?.ToString();
+            _api.UserAgent = context.Connection.Id.ToString();
             var token = context.Request.Cookies["token"];
             if (string.IsNullOrWhiteSpace(token) is false)
             {

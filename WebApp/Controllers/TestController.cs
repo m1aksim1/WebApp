@@ -18,14 +18,12 @@ namespace WebApp.Controllers
         [Authorize]
         public IActionResult CreateTest()
         {
-            string userAgent = HttpContext.Request.Headers.UserAgent;
-            return View(_client.GetRequest<List<TheoryViewModel>>($"http://localhost:9002/theories/?user_agent={userAgent}" + $"&get_content={true}"));
+            return View(_client.GetRequest<List<TheoryViewModel>>($"theories/?get_content={true}"));
         }
         [HttpPost]
         [Authorize]
         public void CreateTest(TestViewModel model)
         {
-            string userAgent = HttpContext.Request.Headers.UserAgent;
             var form = this.ControllerContext.HttpContext.Request.Form;
             var quest_contents = form["quest_content[]"];
             var complition_times = form["complition_time[]"];
@@ -76,31 +74,29 @@ namespace WebApp.Controllers
                 model.questions.Add(quest);
             }
             Console.WriteLine(model);
-            _client.PostRequest<TestViewModel>($"http://localhost:9002/test/?user_agent={userAgent}", model);
+            _client.PostRequest<TestViewModel>($"test/", model);
         }
         
         [HttpGet]
         public IActionResult Test()
         {
-            string userAgent = HttpContext.Request.Headers.UserAgent;
-            return View(_client.GetRequest<List<TestViewModelView>>($"http://localhost:9002/created_test/?user_agent={userAgent}"));
+            return View(_client.GetRequest<List<TestViewModelView>>($"created_test/"));
         }
         [HttpGet]
         public IActionResult PassingTest(Guid id)
         {
-            string userAgent = HttpContext.Request.Headers.UserAgent;
             try
             {
-                _client.PostRequest<TestViewModelView>($"http://localhost:9002/start_test/?user_agent={userAgent}&test_id={id}", new TestViewModelView());
-                var Test = _client.GetRequest<TestViewModelView>($"http://localhost:9002/test/?user_agent={userAgent}&aId={id}");
-                var Quest = _client.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}");
+                _client.PostRequest<TestViewModelView>($"start_test/?test_id={id}", new TestViewModelView());
+                var Test = _client.GetRequest<TestViewModelView>($"test/?aId={id}");
+                var Quest = _client.GetRequest<QuestionViewModel>($"current_question/");
                 Quest.RemainingTime = (long)TimeSpan.Parse(Test.complition_time).TotalMilliseconds;
                 return View(Quest);
             }
             catch (Exception)
             {
-                var Test = _client.GetRequest<TestViewModelView>($"http://localhost:9002/test/?user_agent={userAgent}&aId={id}");
-                var Quest = _client.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}");
+                var Test = _client.GetRequest<TestViewModelView>($"test/?aId={id}");
+                var Quest = _client.GetRequest<QuestionViewModel>($"current_question/");
                 Quest.RemainingTime = (long)TimeSpan.Parse(Test.complition_time).TotalMilliseconds;
                 return View(Quest);
             }
@@ -110,7 +106,6 @@ namespace WebApp.Controllers
         {
             var answers = new AnswerViewModel();
             
-            string userAgent = HttpContext.Request.Headers.UserAgent;
             var form = this.ControllerContext.HttpContext.Request.Form;
             var AnswersIsTrue = form["answersIsTrue[]"];
             var AnswersId = form["answersId[]"];
@@ -131,12 +126,12 @@ namespace WebApp.Controllers
             }
             try
             {
-                _client.PostRequest<AnswerViewModel>($"http://localhost:9002/answer/?user_agent={userAgent}", answers);
-                return View(_client.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
+                _client.PostRequest<AnswerViewModel>($"answer/", answers);
+                return View(_client.GetRequest<QuestionViewModel>($"current_question/"));
             }
             catch (Exception ex)
             {
-                var Results = _client.GetRequest<List<ResultViewModel>>($"http://localhost:9002/results_test_by_user_easy/?user_agent={userAgent}");
+                var Results = _client.GetRequest<List<ResultViewModel>>($"results_test_by_user_easy/");
                 
                 return View("~/Views/Result/TestResult.cshtml", Results.Last());
             }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using WebApp.Models;
@@ -9,7 +10,8 @@ namespace WebApp
     {
         public readonly List<UserViewModel> Users = new List<UserViewModel>();
         private readonly HttpClient _client = new();
-
+        public string IP;
+        public string UserAgent;
 
         public APIClient(IConfiguration configuration)
         {
@@ -18,10 +20,18 @@ namespace WebApp
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
+        public string addParams(string url)
+        {
+            if (url.Replace("?", "").Length != url.Length)
+            {
+                return url + "&user_agent="+UserAgent+ "&ip_address"+IP;
+            }
+            return url + "?&user_agent=" + UserAgent + "&ip_address" + IP;
 
+        }
         public T? GetRequest<T>(string requestUrl)
         {
-            var response = _client.GetAsync(requestUrl);    
+            var response = _client.GetAsync(addParams(requestUrl));    
             var result = response.Result.Content.ReadAsStringAsync().Result;
             if (response.Result.IsSuccessStatusCode)
             {

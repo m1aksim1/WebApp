@@ -25,7 +25,6 @@ namespace WebApp.Controllers
         [HttpPost]
         public IActionResult Enter(string login, string password)
         {
-       
             var account = _client.Users.FirstOrDefault(x => x.Login.Equals(login) && x.Password.Equals(password));
             if(account == null)
             {
