@@ -10,14 +10,19 @@ namespace WebApp.Controllers
 {
     public class TestController : Controller
     {
-        [Authorize(Roles = "Admin")]
+        private APIClient _client;
+        public TestController(APIClient client)
+        {
+            _client = client;
+        }
+        [Authorize]
         public IActionResult CreateTest()
         {
             string userAgent = HttpContext.Request.Headers.UserAgent;
-            return View(APIClient.GetRequest<List<TheoryViewModel>>($"http://localhost:9002/theories/?user_agent={userAgent}" + $"&get_content={true}"));
+            return View(_client.GetRequest<List<TheoryViewModel>>($"http://localhost:9002/theories/?user_agent={userAgent}" + $"&get_content={true}"));
         }
-        [Authorize(Roles = "Admin")]
         [HttpPost]
+        [Authorize]
         public void CreateTest(TestViewModel model)
         {
             string userAgent = HttpContext.Request.Headers.UserAgent;
@@ -71,14 +76,14 @@ namespace WebApp.Controllers
                 model.questions.Add(quest);
             }
             Console.WriteLine(model);
-            APIClient.PostRequest<TestViewModel>($"http://localhost:9002/test/?user_agent={userAgent}", model);
+            _client.PostRequest<TestViewModel>($"http://localhost:9002/test/?user_agent={userAgent}", model);
         }
         
         [HttpGet]
         public IActionResult Test()
         {
             string userAgent = HttpContext.Request.Headers.UserAgent;
-            return View(APIClient.GetRequest<List<TestViewModelView>>($"http://localhost:9002/created_test/?user_agent={userAgent}"));
+            return View(_client.GetRequest<List<TestViewModelView>>($"http://localhost:9002/created_test/?user_agent={userAgent}"));
         }
         [HttpGet]
         public IActionResult PassingTest(Guid id)
@@ -86,16 +91,16 @@ namespace WebApp.Controllers
             string userAgent = HttpContext.Request.Headers.UserAgent;
             try
             {
-                APIClient.PostRequest<TestViewModelView>($"http://localhost:9002/start_test/?user_agent={userAgent}&test_id={id}", new TestViewModelView());
-                var Test = APIClient.GetRequest<TestViewModelView>($"http://localhost:9002/test/?user_agent={userAgent}&aId={id}");
-                var Quest = APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}");
+                _client.PostRequest<TestViewModelView>($"http://localhost:9002/start_test/?user_agent={userAgent}&test_id={id}", new TestViewModelView());
+                var Test = _client.GetRequest<TestViewModelView>($"http://localhost:9002/test/?user_agent={userAgent}&aId={id}");
+                var Quest = _client.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}");
                 Quest.RemainingTime = (long)TimeSpan.Parse(Test.complition_time).TotalMilliseconds;
                 return View(Quest);
             }
             catch (Exception)
             {
-                var Test = APIClient.GetRequest<TestViewModelView>($"http://localhost:9002/test/?user_agent={userAgent}&aId={id}");
-                var Quest = APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}");
+                var Test = _client.GetRequest<TestViewModelView>($"http://localhost:9002/test/?user_agent={userAgent}&aId={id}");
+                var Quest = _client.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}");
                 Quest.RemainingTime = (long)TimeSpan.Parse(Test.complition_time).TotalMilliseconds;
                 return View(Quest);
             }
@@ -126,12 +131,12 @@ namespace WebApp.Controllers
             }
             try
             {
-                APIClient.PostRequest<AnswerViewModel>($"http://localhost:9002/answer/?user_agent={userAgent}", answers);
-                return View(APIClient.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
+                _client.PostRequest<AnswerViewModel>($"http://localhost:9002/answer/?user_agent={userAgent}", answers);
+                return View(_client.GetRequest<QuestionViewModel>($"http://localhost:9002/current_question/?user_agent={userAgent}"));
             }
             catch (Exception ex)
             {
-                var Results = APIClient.GetRequest<List<ResultViewModel>>($"http://localhost:9002/results_test_by_user_easy/?user_agent={userAgent}");
+                var Results = _client.GetRequest<List<ResultViewModel>>($"http://localhost:9002/results_test_by_user_easy/?user_agent={userAgent}");
                 
                 return View("~/Views/Result/TestResult.cshtml", Results.Last());
             }

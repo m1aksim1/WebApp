@@ -1,21 +1,25 @@
 ﻿using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
+using WebApp.Models;
 
 namespace WebApp
 {
     public class APIClient
     {
-        private static readonly HttpClient _client = new();
+        public readonly List<UserViewModel> Users = new List<UserViewModel>();
+        private readonly HttpClient _client = new();
 
-        public static void Connect(IConfiguration configuration)
+
+        public APIClient(IConfiguration configuration)
         {
+            Users.Add(new UserViewModel { Login = configuration["Login"], Password = configuration["Password"] });
             _client.BaseAddress = new Uri(configuration["IPAddress"]);
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public static T? GetRequest<T>(string requestUrl)
+        public T? GetRequest<T>(string requestUrl)
         {
             var response = _client.GetAsync(requestUrl);    
             var result = response.Result.Content.ReadAsStringAsync().Result;
@@ -28,8 +32,7 @@ namespace WebApp
 				throw new Exception(result);
 			}
 		}
-
-        public static void PostRequest<T>(string requestUrl, T model)
+        public void PostRequest<T>(string requestUrl, T model)
         {
             var json = JsonConvert.SerializeObject(model);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
@@ -42,7 +45,7 @@ namespace WebApp
                 throw new Exception(result);
             }
         }
-        public static void PutRequest<T>(string requestUrl, T model)
+        public void PutRequest<T>(string requestUrl, T model)
         {
             var json = JsonConvert.SerializeObject(model);
             var data = new StringContent(json, Encoding.UTF8, "application/json");

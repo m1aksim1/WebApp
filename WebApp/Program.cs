@@ -29,10 +29,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton(new APIClient(builder.Configuration));
 
 var app = builder.Build();
-
-APIClient.Connect(builder.Configuration);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -45,10 +44,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseMiddleware<AuthenticationMiddleware>();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
+
 
 app.MapControllerRoute(
     name: "default",
