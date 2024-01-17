@@ -2,8 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.HttpOverrides;
-using SoftwareInstallationClientApp;
+using WebApp;
 using WebApp.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace WebApp.Controllers
 {
@@ -11,17 +15,34 @@ namespace WebApp.Controllers
     {
         public IActionResult Enter()
         {
-            var coock = HttpContext.Response.Cookies;
             return View();
         }
         [HttpPost]
-        public string Enter(string pohui)
+        public IActionResult Enter(string login, string password)
         {
-            string userAgent = HttpContext.Request.Headers.UserAgent;
-
-            APIClient.PostRequest<UserViewModel>($"http://localhost:9002/?user_agent={userAgent}", new UserViewModel { UserAgent = userAgent});
-
-            return "das";
+            try
+            {
+                var account = new UserViewModel { Login = login, Password = password, Id = 0 };
+                var claims = new List<Claim>
+                {
+                    new(ClaimsIdentity.DefaultNameClaimType, account.Id.ToString()),
+                    new(ClaimsIdentity.DefaultRoleClaimType, "Admin" ),
+                };
+                ClaimsIdentity claimsIdentity = new(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+                var jwt = new JwtSecurityToken(
+                    issuer: AuthOptions.ISSUER,
+                    audience: AuthOptions.AUDIENCE,
+                    claims: claimsIdentity.Claims,
+                    expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                var jwtToken = "Bearer " + new JwtSecurityTokenHandler().WriteToken(jwt);
+                Response.Cookies.Append("token", jwtToken);
+                return Ok(jwtToken);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }

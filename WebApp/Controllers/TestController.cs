@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RestSharp;
-using SoftwareInstallationClientApp;
+using WebApp;
 using System.Globalization;
 using System.Reflection;
 using WebApp.Models;
@@ -9,11 +10,13 @@ namespace WebApp.Controllers
 {
     public class TestController : Controller
     {
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateTest()
         {
             string userAgent = HttpContext.Request.Headers.UserAgent;
             return View(APIClient.GetRequest<List<TheoryViewModel>>($"http://localhost:9002/theories/?user_agent={userAgent}" + $"&get_content={true}"));
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public void CreateTest(TestViewModel model)
         {
