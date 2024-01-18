@@ -10,6 +10,7 @@
         public PointerToAnswer pointer_to_answer { get; set; } = new PointerToAnswer();
         public List<AnswerTest> answers_test { get; set; } = new List<AnswerTest>();
         public string? type { get; set; } = string.Empty;
+        public string? test { get; set; }
 
         public long RemainingTime { get; set; }
     }

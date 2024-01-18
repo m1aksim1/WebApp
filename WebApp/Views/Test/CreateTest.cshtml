@@ -23,7 +23,7 @@
 		    <div class="col-2">Название:</div>
             <div class="col-10 mb-3"><input class="w-100" type="text" name="name" id="name" /></div>
 		    <div class="col-2">Время выполнения</div>
-            <div class="col-10 mb-3"><input class="w-100" type="time" id="StudyTime" name="StudyTime" /></div>
+            <div class="col-10 mb-3"><input class="w-100" type="time" id="StudyTime" name="complition_time" /></div>
             <div class="col-2">Количество попыткок</div>
             <div class="col-10 mb-3"><input class="w-100" type="number" id="count_attempts" name="count_attempts" /></div>
             <div class="col-2">Теория для теста</div>
@@ -79,9 +79,6 @@
                 '        </div>' +
                 '        <div class="col-2">вес вопроса</div>' +
                 '        <div class="col-10 mb-3"><input class="w-100" type="number" name="weight[]" /></div>' +
-                '        ' +
-                '        <div class="col-2">время ответа на вопрос</div>' +
-                '        <div class="col-10 mb-3"><input class="w-100" type="time" name="complition_time[]" /></div>' +
                 '        ' +
                 `        <div class="answer-list${currentQuestion} col-12">` +
                 '            <div class="input-group mb-3">' +

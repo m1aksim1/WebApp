@@ -26,7 +26,6 @@ namespace WebApp.Controllers
         {
             var form = this.ControllerContext.HttpContext.Request.Form;
             var quest_contents = form["quest_content[]"];
-            var complition_times = form["complition_time[]"];
             var weights = form["weight[]"];
 
             if(form["show_answer"] == "on") 
@@ -67,13 +66,11 @@ namespace WebApp.Controllers
                     pointer_to_answer = new PointerToAnswer { chapter = new Guid("00bfd2af-b124-43f6-b5e6-e01279d6671e"), start = 0, end = 0 },
                     weight = int.Parse(weights[i]),
                     answers_test = questionViewModel.answers_test,
-                    complition_time = complition_times[i]+":00.000Z",
                     name = quest_contents[i],
                 };
 
                 model.questions.Add(quest);
             }
-            Console.WriteLine(model);
             _client.PostRequest<TestViewModel>($"test/", model);
         }
         

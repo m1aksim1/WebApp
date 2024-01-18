@@ -46,7 +46,7 @@ namespace WebApp
         {
             var json = JsonConvert.SerializeObject(model);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-
+            requestUrl = addParams(requestUrl);
             var response = _client.PostAsync(requestUrl, data);
 
             var result = response.Result.Content.ReadAsStringAsync().Result;
@@ -60,7 +60,7 @@ namespace WebApp
             var json = JsonConvert.SerializeObject(model);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = _client.PutAsync(requestUrl, data);
+            var response = _client.PutAsync(addParams(requestUrl), data);
 
             var result = response.Result.Content.ReadAsStringAsync().Result;
             if (!response.Result.IsSuccessStatusCode)
