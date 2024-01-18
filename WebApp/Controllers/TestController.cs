@@ -72,12 +72,14 @@ namespace WebApp.Controllers
                 model.questions.Add(quest);
             }
             _client.PostRequest<TestViewModel>($"test/", model);
+            Response.Redirect("Test");
         }
-        
+
         [HttpGet]
         public IActionResult Test()
         {
             return View(_client.GetRequest<List<TestViewModelView>>($"created_test/"));
+
         }
         [HttpGet]
         public IActionResult PassingTest(Guid id)
@@ -90,7 +92,8 @@ namespace WebApp.Controllers
                 Quest.RemainingTime = (long)TimeSpan.Parse(Test.complition_time).TotalMilliseconds;
                 return View(Quest);
             }
-            catch (Exception)
+
+            catch (Exception ex)
             {
                 var Test = _client.GetRequest<TestViewModelView>($"test/?aId={id}");
                 var Quest = _client.GetRequest<QuestionViewModel>($"current_question/");

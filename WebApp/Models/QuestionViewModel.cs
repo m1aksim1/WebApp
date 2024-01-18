@@ -4,7 +4,6 @@
     {
         public Guid id { get; set; }
         public string name { get; set; } = string.Empty;
-        public TimeOnly ComplitionTime { get; set; }
         public string? complition_time { get; set; }
         public int? weight { get; set; }
         public PointerToAnswer pointer_to_answer { get; set; } = new PointerToAnswer();
