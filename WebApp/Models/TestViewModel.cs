@@ -22,19 +22,29 @@
         public string complition_time { get; set; }
         public bool shuffle { get; set; }
         public bool show_answer { get; set; }
-        
-        TestViewModel GetViewModel()
+       
+    }
+    public class TestViewModelViewAdapter
+    {
+        private TestViewModelView _testViewModelView;
+
+        public TestViewModelViewAdapter(TestViewModelView testViewModelView)
         {
-            return new TestViewModel 
-            { 
-                id = id,
-                name = name, 
-                theory = theory.id,
-                questions = questions,
-                count_attempts = count_attempts,
-                complition_time = complition_time,
-                shuffle = shuffle,
-                show_answer = show_answer,
+            _testViewModelView = testViewModelView;
+        }
+
+        public TestViewModel GetViewModel()
+        {
+            return new TestViewModel
+            {
+                id = _testViewModelView.id,
+                name = _testViewModelView.name,
+                theory = _testViewModelView.theory.id,
+                questions = _testViewModelView.questions,
+                count_attempts = _testViewModelView.count_attempts,
+                complition_time = _testViewModelView.complition_time,
+                shuffle = _testViewModelView.shuffle,
+                show_answer = _testViewModelView.show_answer,
             };
         }
     }
