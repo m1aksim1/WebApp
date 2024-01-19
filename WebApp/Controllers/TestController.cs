@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RestSharp;
-using WebApp;
-using System.Globalization;
-using System.Reflection;
 using WebApp.Models;
 
 namespace WebApp.Controllers
