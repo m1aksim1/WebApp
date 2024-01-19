@@ -17,7 +17,7 @@
 <div>
     <h2 class="display-4">@ViewData["Title"]</h2>
 </div>
-<div class="row">
+<div class="row ">
     <div class="input-group">
         <label class="col-2">Название Теста: </label>
         <input class="col-10" type="text" value="@Model.name_test" readonly class="form-control">
@@ -30,9 +30,22 @@
     </div>
     @using (Html.BeginForm("Index", "Home", FormMethod.Get))
     {
-        <div class="col-12">
+        <div class="col-12 mb-3">
             <input class="w-100" type="submit" value="Продолжить" />
         </div>
     }
+
+    <form asp-controller="Test" asp-action="SendOnMail" method="post">
+        <div class="input-group">
+
+            <label class="col-2">Почта : </label>
+            <input class="col-10" type="email" name="email" class="form-control">
+            <label class="col-2">Примечание: </label>
+            <input class="col-10" type="text" name="annotation" class="form-control">
+            <div class="col-12">
+                <input class="w-100" type="submit" value="Сохранить на почту" />
+            </div>
+        </div>
+    </form>
 </div>
 

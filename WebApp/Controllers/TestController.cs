@@ -60,10 +60,11 @@ namespace WebApp.Controllers
                     
                     questionViewModel.answers_test.Add(answerTest);
                 }
-                
+                var theory = _client.GetRequest<TheoryViewModel>($"theory/?aId={model.theory}&get_content={true}");
+                var chapterId = theory.chapters[0].id;
                 var quest = new QuestionViewModel
                 {
-                    pointer_to_answer = new PointerToAnswer { chapter = new Guid("00bfd2af-b124-43f6-b5e6-e01279d6671e"), start = 0, end = 0 },
+                    pointer_to_answer = new PointerToAnswer { chapter = chapterId, start = 0, end = 1 },
                     weight = int.Parse(weights[i]),
                     answers_test = questionViewModel.answers_test,
                     name = quest_contents[i],
@@ -132,9 +133,25 @@ namespace WebApp.Controllers
             catch (Exception ex)
             {
                 var Results = _client.GetRequest<List<ResultViewModel>>($"results_test_by_user_easy/");
-                
-                return View("~/Views/Result/TestResult.cshtml", Results.Last());
+                var newestResult = Results.Where(x => x.completed_date!=null).OrderByDescending(r => DateTime.Parse(r.completed_date)).FirstOrDefault();
+
+                return View("~/Views/Result/TestResult.cshtml", newestResult);
             }
+        }
+        [HttpPost]
+        public IActionResult SendOnMail()
+        {
+            var form = this.ControllerContext.HttpContext.Request.Form;
+            
+            var Results = _client.GetRequest<List<ResultViewModel>>($"results_test_by_user_easy/");
+            
+            var email = form["email"];
+            var annotation = form["annotation"];
+            var newestResult = Results.Where(x => x.completed_date != null).OrderByDescending(r => DateTime.Parse(r.completed_date)).FirstOrDefault();
+
+            _client.emailSender.SendEmail(email, annotation, newestResult.ToString());
+            
+            return View("~/Views/Result/TestResult.cshtml", newestResult);
         }
     }
 }

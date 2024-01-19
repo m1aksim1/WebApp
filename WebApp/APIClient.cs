@@ -10,11 +10,13 @@ namespace WebApp
     {
         public readonly List<UserViewModel> Users = new List<UserViewModel>();
         private readonly HttpClient _client = new();
+        public EmailSender emailSender;
         public string IP;
         public string UserAgent;
 
         public APIClient(IConfiguration configuration)
         {
+            emailSender = new EmailSender(configuration["SmtpClientHost"], int.Parse(configuration["SmtpClientPort"]), configuration["MailLogin"], configuration["MailPassword"]);
             Users.Add(new UserViewModel { Login = configuration["Login"], Password = configuration["Password"] });
             _client.BaseAddress = new Uri(configuration["IPAddress"]);
             _client.DefaultRequestHeaders.Accept.Clear();
