@@ -10,8 +10,8 @@
         public string complition_time { get; set; }
         public bool shuffle { get; set; }
         public bool show_answer { get; set; }
-
     }
+
     public class TestViewModelView
     {
         public Guid id { get; set; }
@@ -22,17 +22,15 @@
         public string complition_time { get; set; }
         public bool shuffle { get; set; }
         public bool show_answer { get; set; }
-       
     }
+
     public class TestViewModelViewAdapter
     {
         private TestViewModelView _testViewModelView;
-
         public TestViewModelViewAdapter(TestViewModelView testViewModelView)
         {
             _testViewModelView = testViewModelView;
         }
-
         public TestViewModel GetViewModel()
         {
             return new TestViewModel
